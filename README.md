@@ -22,18 +22,18 @@ text_span_field: 1.0.0
 ## 使用
 ```dart
 TextSpanField(
-            controller: TextEditingController(
-              text: "这是一条测试信息,你们看他的颜色",
-            ),
-            rangeStyles: [
-              RangeStyle(
-                range: TextRange(start: 0, end: 1),
-                style: TextStyle(color: Color(0xFF5BA2FF)),
-              ),
-              RangeStyle(
-                range: TextRange(start: 3, end: 4),
-                style: TextStyle(color: Color(0xFF9C7BFF)),
-              ),
-            ],
-          ),
+    controller: TextEditingController(
+      text: "这是一条测试信息,你们看他的颜色",
+    ),
+    rangeStyles: [
+      RangeStyle(
+        range: TextRange(start: 0, end: 1),
+        style: TextStyle(color: Color(0xFF5BA2FF)),
+      ),
+      RangeStyle(
+        range: TextRange(start: 3, end: 4),
+        style: TextStyle(color: Color(0xFF9C7BFF)),
+      ),
+    ],
+),
 ```
