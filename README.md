@@ -4,6 +4,8 @@
 Flutter自定义文本样式输入框，可以让你在TextField中显示不同样式的文本，例如 #话题# @用户 效果
 
 ## Getting Started
+实现思路已在博客园发表，[点击进入](https://www.cnblogs.com/adversary/p/12580658.html)
+
 
 ### Flutter
 ```
