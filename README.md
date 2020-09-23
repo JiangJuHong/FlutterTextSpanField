@@ -7,12 +7,20 @@ Flutter自定义文本样式输入框，可以让你在TextField中显示不同�
 实现思路已在博客园发表，[点击进入](https://www.cnblogs.com/adversary/p/12580658.html)
 
 
+## 讨论群
+<img
+src="https://raw.githubusercontent.com/JiangJuHong/access-images/master/other/qq-group.jpg"
+height="300em" style="max-width:100%;display: inline-block;"/>  
+[点击加入群聊](https://jq.qq.com/?_wv=1027&k=QxCWMlUf)  
+
+## 集成
+
 ### Flutter
 ```
 text_span_field: 1.0.0
 ```
 
-### Android 端集成
+### Android
 无需额外配置，已内部打入混淆配置
 
 ### IOS
