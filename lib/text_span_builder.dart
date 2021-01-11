@@ -121,7 +121,7 @@ class TextSpanBuilder {
     String text = this._textEditingController.text;
     for (var item in widget) {
       // 非块组件不进行限制
-      if (item.block != null && !item.block) {
+      if (item.block == null || !item.block) {
         continue;
       }
 
@@ -142,7 +142,7 @@ class TextSpanBuilder {
     TextSelection selection = this._textEditingController.selection;
     for (var item in widget) {
       // 非块组件不进行限制
-      if (item.block != null && !item.block) {
+      if (item.block == null || !item.block) {
         continue;
       }
 
