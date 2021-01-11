@@ -1,3 +1,2 @@
-## 0.0.1
-
-* TODO: Describe initial release.
+## 1.0.0
+* 实现对根据 RangeStyle 对指定下标区域的文本进行设置样式
