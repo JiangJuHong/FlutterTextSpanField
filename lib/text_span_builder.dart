@@ -25,9 +25,17 @@ class TextSpanBuilder {
     TextEditingController textEditingController,
     EditableTextSpan editableTextSpan,
   }) {
-    _widgetBuild = widgetBuild;
+    if (this._textEditingController != null) this._textEditingController.removeListener(this._textControllerListener);
+    this._widgetBuild = widgetBuild;
     this._editableTextSpan = editableTextSpan;
     this._textEditingController = textEditingController;
+    this._textEditingController.addListener(this._textControllerListener);
+  }
+
+  /// 控制器监听器
+  _textControllerListener() {
+    // 光标位置限制
+    this._cursorPositionLimit(this._currentWidgets);
   }
 
   /// 根据文本创建组件构建列表，此操作会对用户传入进来Widget构建列表二次变更
@@ -89,18 +97,56 @@ class TextSpanBuilder {
         if (item.build != null) {
           span = item.build(currentText);
         }
-        result.add(TextSpanWidget(range: item.range, span: span));
+        result.add(TextSpanWidget(range: item.range, block: item.block, span: span));
       }
     }
     return result;
   }
 
-  /// 根据文本构建 InlineSpan 内容
+  /// 光标位置限制，根据当前组件列表和光标位置，对光标进行限制操作
+  /// 如果组件不允许点击，则会自动跳到前面或后面
+  void _cursorPositionLimit(List<TextSpanWidget> widget) {
+    TextSelection selection = this._textEditingController.selection;
+    String text = this._textEditingController.text;
+    for (var item in widget) {
+      // 非块组件不进行限制
+      if (item.block != null && !item.block) {
+        continue;
+      }
+      int start = this._calculationCursorPosition(item.range, selection.baseOffset, text.length);
+      int end = this._calculationCursorPosition(item.range, selection.extentOffset, text.length);
+
+      if (start != selection.baseOffset || end != selection.extentOffset) {
+        this._textEditingController.selection = TextSelection(baseOffset: start, extentOffset: end);
+        break;
+      }
+    }
+  }
+
+  /// 计算光标位置
+  /// [range] 范围域
+  /// [position] 当前位置
+  /// [max] 最大值
+  int _calculationCursorPosition(TextRange range, int position, int max) {
+    if (position >= range.start && position <= range.end) {
+      int median = range.start + (range.end - range.start) ~/ 2;
+      if (position < median) {
+        return range.start < 0 ? 0 : range.start;
+      }
+      return range.end > max ? max : range.end;
+    }
+    return position;
+  }
+
+  /// [公开方法] 根据文本构建 InlineSpan 内容
   List<InlineSpan> buildSpan(String text) {
+    // 重置当前组件
     this._currentWidgets = this._buildTextSpanWidget(text);
+
+    // 返回绘制内容
     return this._currentWidgets.map((item) => item.span).toList();
   }
 
-  /// 获得组件列表
+  /// [公开方法] 获得组件列表
   List<TextSpanWidget> getWidgets() => this._currentWidgets;
 }

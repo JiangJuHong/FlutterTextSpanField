@@ -34,6 +34,7 @@ class _MyAppState extends State<MyApp> {
       result.add(
         TextSpanWidgetBuilder(
           range: TextRange(start: m.start, end: m.end),
+          block: true,
           build: _topicBuilder,
         ),
       );
