@@ -19,6 +19,9 @@ class TextSpanBuilder {
   /// 当前组件列表
   List<TextSpanWidget> _currentWidgets = [];
 
+  /// 最后一次操作的问题
+  String _lastText = "";
+
   /// 绑定数据值组件
   void bind({
     TextSpanWidgetGroupBuilder widgetBuild,
@@ -34,6 +37,14 @@ class TextSpanBuilder {
 
   /// 控制器监听器
   _textControllerListener() {
+    String text = this._textEditingController.text;
+
+    // 删除限制
+    if (this._lastText.length - text.length == 1) {
+      this._deleteLimit(this._currentWidgets);
+    }
+    this._lastText = text;
+
     // 光标位置限制
     this._cursorPositionLimit(this._currentWidgets);
   }
@@ -113,12 +124,39 @@ class TextSpanBuilder {
       if (item.block != null && !item.block) {
         continue;
       }
+
+      // 获得新的选择器位置
       int start = this._calculationCursorPosition(item.range, selection.baseOffset, text.length);
       int end = this._calculationCursorPosition(item.range, selection.extentOffset, text.length);
 
+      // 如果位置发生改变，则进行应用
       if (start != selection.baseOffset || end != selection.extentOffset) {
         this._textEditingController.selection = TextSelection(baseOffset: start, extentOffset: end);
         break;
+      }
+    }
+  }
+
+  /// 删除限制,如果组件是成块删除，则会自动删除整块内容
+  void _deleteLimit(List<TextSpanWidget> widget) {
+    TextSelection selection = this._textEditingController.selection;
+    for (var item in widget) {
+      // 非块组件不进行限制
+      if (item.block != null && !item.block) {
+        continue;
+      }
+
+      // 如果光标在块末尾位置，则代表删除的是当前块。然后移除块的内容
+      // 之所以需要 -1，是因为已经删除了一个字符，所以需要前移一位
+      if (item.range.end - 1 == selection.baseOffset) {
+        String newText = this._lastText.substring(item.range.end);
+        if (item.range.start != 0) {
+          newText = this._lastText.substring(0, item.range.start) + newText;
+        }
+        this._textEditingController.text = newText;
+
+        // 重置光标到开始的位置
+        this._textEditingController.selection = TextSelection(baseOffset: item.range.start, extentOffset: item.range.start);
       }
     }
   }
