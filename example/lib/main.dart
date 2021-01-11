@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:text_span_field/text_span_field.dart';
-import 'package:text_span_field/range_style.dart';
+import 'package:text_span_field/text_span_builder.dart';
 
 void main() => runApp(MyApp());
 
@@ -24,16 +24,20 @@ class _MyAppState extends State<MyApp> {
     super.initState();
   }
 
+  TextSpan _atBuilder(String text) => TextSpan(text: text, style: TextStyle(color: Color(0xFF5BA2FF)));
+
+  TextSpan _topicBuilder(String text) => TextSpan(text: text, style: TextStyle(color: Color(0xFF9C7BFF)));
+
   /// 获得文本输入框样式
-  List<RangeStyle> getTextFieldStyle() {
-    List<RangeStyle> result = [];
+  List<TextSpanBuilder> getTextFieldStyle() {
+    List<TextSpanBuilder> result = [];
 
     // 匹配话题
     for (Match m in topicReg.allMatches(text)) {
       result.add(
-        RangeStyle(
+        TextSpanBuilder(
           range: TextRange(start: m.start, end: m.end),
-          style: TextStyle(color: Color(0xFF9C7BFF)),
+          builder: _topicBuilder,
         ),
       );
     }
@@ -41,9 +45,9 @@ class _MyAppState extends State<MyApp> {
     // 匹配@
     for (Match m in accountRemindReg.allMatches(text)) {
       result.add(
-        RangeStyle(
+        TextSpanBuilder(
           range: TextRange(start: m.start, end: m.end),
-          style: TextStyle(color: Color(0xFF5BA2FF)),
+          builder: _atBuilder,
         ),
       );
     }
@@ -65,7 +69,7 @@ class _MyAppState extends State<MyApp> {
               contentPadding: EdgeInsets.all(20),
               hintText: '分享你的点滴，记录这一刻...',
             ),
-            rangeStyles: this.getTextFieldStyle(),
+            builder: this.getTextFieldStyle(),
           ),
         ),
       ),
