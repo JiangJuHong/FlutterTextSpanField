@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:text_span_field/text_span_field.dart';
-import 'package:text_span_field/text_span_builder.dart';
+import 'package:text_span_field/data/text_span_widget_builder.dart';
 
 void main() => runApp(MyApp());
 
@@ -10,9 +10,6 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  /// 输入的文本内容如
-  String text = "";
-
   /// 话题正则
   RegExp topicReg = new RegExp(r"#([^#]{1,})#");
 
@@ -29,15 +26,15 @@ class _MyAppState extends State<MyApp> {
   TextSpan _topicBuilder(String text) => TextSpan(text: text, style: TextStyle(color: Color(0xFF9C7BFF)));
 
   /// 获得文本输入框样式
-  List<TextSpanBuilder> getTextFieldStyle() {
-    List<TextSpanBuilder> result = [];
+  List<TextSpanWidgetBuilder> widgetBuild(String text) {
+    List<TextSpanWidgetBuilder> result = [];
 
     // 匹配话题
     for (Match m in topicReg.allMatches(text)) {
       result.add(
-        TextSpanBuilder(
+        TextSpanWidgetBuilder(
           range: TextRange(start: m.start, end: m.end),
-          builder: _topicBuilder,
+          build: _topicBuilder,
         ),
       );
     }
@@ -45,9 +42,9 @@ class _MyAppState extends State<MyApp> {
     // 匹配@
     for (Match m in accountRemindReg.allMatches(text)) {
       result.add(
-        TextSpanBuilder(
+        TextSpanWidgetBuilder(
           range: TextRange(start: m.start, end: m.end),
-          builder: _atBuilder,
+          build: _atBuilder,
         ),
       );
     }
@@ -64,12 +61,11 @@ class _MyAppState extends State<MyApp> {
         body: Center(
           child: TextSpanField(
             maxLines: null,
-            onChanged: (value) => this.setState(() => text = value),
             decoration: InputDecoration(
               contentPadding: EdgeInsets.all(20),
               hintText: '分享你的点滴，记录这一刻...',
             ),
-            builder: this.getTextFieldStyle(),
+            widgetBuild: this.widgetBuild,
           ),
         ),
       ),

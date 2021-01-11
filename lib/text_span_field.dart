@@ -9,8 +9,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
+import 'package:text_span_field/build_callback_types.dart';
 import 'package:text_span_field/text_span_builder.dart';
-
 import 'editable_text_span.dart';
 export 'package:flutter/services.dart' show TextInputType, TextInputAction, TextCapitalization;
 
@@ -321,7 +321,7 @@ class TextSpanField extends StatefulWidget {
     this.buildCounter,
     this.scrollController,
     this.scrollPhysics,
-    this.builder,
+    this.widgetBuild,
   })  : assert(textAlign != null),
         assert(readOnly != null),
         assert(autofocus != null),
@@ -361,7 +361,7 @@ class TextSpanField extends StatefulWidget {
         super(key: key);
 
   /// Custom Styles
-  final List<TextSpanBuilder> builder;
+  final TextSpanWidgetGroupBuilder widgetBuild;
 
   /// Controls the text being edited.
   ///
@@ -721,6 +721,8 @@ class _TextSpanFieldState extends State<TextSpanField> implements TextSelectionG
 
   _TextSpanFieldSelectionGestureDetectorBuilder _selectionGestureDetectorBuilder;
 
+  TextSpanBuilder _textSpanBuilder;
+
   // API for TextSelectionGestureDetectorBuilderDelegate.
   @override
   bool forcePressEnabled;
@@ -802,6 +804,7 @@ class _TextSpanFieldState extends State<TextSpanField> implements TextSelectionG
     if (widget.controller == null) {
       _controller = TextEditingController();
     }
+    _textSpanBuilder = TextSpanBuilder(widgetBuild: widget.widgetBuild);
     _effectiveFocusNode.canRequestFocus = _isEnabled;
   }
 
@@ -929,54 +932,56 @@ class _TextSpanFieldState extends State<TextSpanField> implements TextSelectionG
         break;
     }
 
-    Widget child = RepaintBoundary(
-      child: EditableTextSpan(
-        builder: widget.builder,
-        key: editableTextKey,
-        readOnly: widget.readOnly,
-        toolbarOptions: widget.toolbarOptions,
-        showCursor: widget.showCursor,
-        showSelectionHandles: _showSelectionHandles,
-        controller: controller,
-        focusNode: focusNode,
-        keyboardType: widget.keyboardType,
-        textInputAction: widget.textInputAction,
-        textCapitalization: widget.textCapitalization,
-        style: style,
-        strutStyle: widget.strutStyle,
-        textAlign: widget.textAlign,
-        textDirection: widget.textDirection,
-        autofocus: widget.autofocus,
-        obscureText: widget.obscureText,
-        autocorrect: widget.autocorrect,
-        enableSuggestions: widget.enableSuggestions,
-        maxLines: widget.maxLines,
-        minLines: widget.minLines,
-        expands: widget.expands,
-        selectionColor: themeData.textSelectionColor,
-        selectionControls: widget.selectionEnabled ? textSelectionControls : null,
-        onChanged: widget.onChanged,
-        onSelectionChanged: _handleSelectionChanged,
-        onEditingComplete: widget.onEditingComplete,
-        onSubmitted: widget.onSubmitted,
-        onSelectionHandleTapped: _handleSelectionHandleTapped,
-        inputFormatters: formatters,
-        rendererIgnoresPointer: true,
-        cursorWidth: widget.cursorWidth,
-        cursorRadius: cursorRadius,
-        cursorColor: cursorColor,
-        cursorOpacityAnimates: cursorOpacityAnimates,
-        cursorOffset: cursorOffset,
-        paintCursorAboveText: paintCursorAboveText,
-        backgroundCursorColor: CupertinoColors.inactiveGray,
-        scrollPadding: widget.scrollPadding,
-        keyboardAppearance: keyboardAppearance,
-        enableInteractiveSelection: widget.enableInteractiveSelection,
-        dragStartBehavior: widget.dragStartBehavior,
-        scrollController: widget.scrollController,
-        scrollPhysics: widget.scrollPhysics,
-      ),
+    EditableTextSpan editableTextSpan = EditableTextSpan(
+      builder: _textSpanBuilder,
+      key: editableTextKey,
+      readOnly: widget.readOnly,
+      toolbarOptions: widget.toolbarOptions,
+      showCursor: widget.showCursor,
+      showSelectionHandles: _showSelectionHandles,
+      controller: controller,
+      focusNode: focusNode,
+      keyboardType: widget.keyboardType,
+      textInputAction: widget.textInputAction,
+      textCapitalization: widget.textCapitalization,
+      style: style,
+      strutStyle: widget.strutStyle,
+      textAlign: widget.textAlign,
+      textDirection: widget.textDirection,
+      autofocus: widget.autofocus,
+      obscureText: widget.obscureText,
+      autocorrect: widget.autocorrect,
+      enableSuggestions: widget.enableSuggestions,
+      maxLines: widget.maxLines,
+      minLines: widget.minLines,
+      expands: widget.expands,
+      selectionColor: themeData.textSelectionColor,
+      selectionControls: widget.selectionEnabled ? textSelectionControls : null,
+      onChanged: widget.onChanged,
+      onSelectionChanged: _handleSelectionChanged,
+      onEditingComplete: widget.onEditingComplete,
+      onSubmitted: widget.onSubmitted,
+      onSelectionHandleTapped: _handleSelectionHandleTapped,
+      inputFormatters: formatters,
+      rendererIgnoresPointer: true,
+      cursorWidth: widget.cursorWidth,
+      cursorRadius: cursorRadius,
+      cursorColor: cursorColor,
+      cursorOpacityAnimates: cursorOpacityAnimates,
+      cursorOffset: cursorOffset,
+      paintCursorAboveText: paintCursorAboveText,
+      backgroundCursorColor: CupertinoColors.inactiveGray,
+      scrollPadding: widget.scrollPadding,
+      keyboardAppearance: keyboardAppearance,
+      enableInteractiveSelection: widget.enableInteractiveSelection,
+      dragStartBehavior: widget.dragStartBehavior,
+      scrollController: widget.scrollController,
+      scrollPhysics: widget.scrollPhysics,
     );
+
+    _textSpanBuilder.bind(textEditingController: this._controller, editableTextSpan: editableTextSpan);
+
+    Widget child = RepaintBoundary(child: editableTextSpan);
 
     if (widget.decoration != null) {
       child = AnimatedBuilder(
