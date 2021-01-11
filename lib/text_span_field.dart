@@ -322,6 +322,7 @@ class TextSpanField extends StatefulWidget {
     this.scrollController,
     this.scrollPhysics,
     this.widgetBuild,
+    this.textSpanBuilder,
   })  : assert(textAlign != null),
         assert(readOnly != null),
         assert(autofocus != null),
@@ -362,6 +363,9 @@ class TextSpanField extends StatefulWidget {
 
   /// Custom Styles
   final TextSpanWidgetGroupBuilder widgetBuild;
+
+  /// Custom Builder
+  final TextSpanBuilder textSpanBuilder;
 
   /// Controls the text being edited.
   ///
@@ -804,7 +808,7 @@ class _TextSpanFieldState extends State<TextSpanField> implements TextSelectionG
     if (widget.controller == null) {
       _controller = TextEditingController();
     }
-    _textSpanBuilder = TextSpanBuilder(widgetBuild: widget.widgetBuild);
+    _textSpanBuilder = widget.textSpanBuilder ?? TextSpanBuilder();
     _effectiveFocusNode.canRequestFocus = _isEnabled;
   }
 
@@ -979,7 +983,7 @@ class _TextSpanFieldState extends State<TextSpanField> implements TextSelectionG
       scrollPhysics: widget.scrollPhysics,
     );
 
-    _textSpanBuilder.bind(textEditingController: this._controller, editableTextSpan: editableTextSpan);
+    _textSpanBuilder.bind(widgetBuild: widget.widgetBuild, textEditingController: this._controller, editableTextSpan: editableTextSpan);
 
     Widget child = RepaintBoundary(child: editableTextSpan);
 

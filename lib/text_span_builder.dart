@@ -8,7 +8,7 @@ import 'data/text_span_widget.dart';
 /// 构建器
 class TextSpanBuilder {
   /// Widget构建属性列表
-  final TextSpanWidgetGroupBuilder widgetBuild;
+  TextSpanWidgetGroupBuilder _widgetBuild;
 
   /// 文本域控制器
   TextEditingController _textEditingController;
@@ -16,15 +16,16 @@ class TextSpanBuilder {
   /// 文本编辑器
   EditableTextSpan _editableTextSpan;
 
-  TextSpanBuilder({
-    this.widgetBuild,
-  });
+  /// 当前组件列表
+  List<TextSpanWidget> _currentWidgets = [];
 
-  /// 绑定组件
+  /// 绑定数据值组件
   void bind({
+    TextSpanWidgetGroupBuilder widgetBuild,
     TextEditingController textEditingController,
     EditableTextSpan editableTextSpan,
   }) {
+    _widgetBuild = widgetBuild;
     this._editableTextSpan = editableTextSpan;
     this._textEditingController = textEditingController;
   }
@@ -32,7 +33,7 @@ class TextSpanBuilder {
   /// 根据文本创建组件构建列表，此操作会对用户传入进来Widget构建列表二次变更
   /// [text] 当前的文本内容
   List<TextSpanWidgetBuilder> _createTextSpanWidgetList(String text) {
-    var source = this.widgetBuild(text) ?? <TextSpanWidgetBuilder>[];
+    var source = this._widgetBuild(text) ?? <TextSpanWidgetBuilder>[];
 
     if (source.length == 0) {
       return <TextSpanWidgetBuilder>[];
@@ -75,6 +76,10 @@ class TextSpanBuilder {
   /// [text] 文本内容
   List<TextSpanWidget> _buildTextSpanWidget(String text) {
     List<TextSpanWidgetBuilder> builder = this._createTextSpanWidgetList(text);
+    if (builder.length == 0) {
+      return [TextSpanWidget(range: TextRange(start: 0, end: text.length), span: TextSpan(text: text))];
+    }
+
     List<TextSpanWidget> result = [];
     for (var item in builder) {
       // 在范围内才进行添加
@@ -92,7 +97,10 @@ class TextSpanBuilder {
 
   /// 根据文本构建 InlineSpan 内容
   List<InlineSpan> buildSpan(String text) {
-    List<InlineSpan> children = this._buildTextSpanWidget(text).map((item) => item.span).toList();
-    return children.length > 0 ? children : [TextSpan(text: text)];
+    this._currentWidgets = this._buildTextSpanWidget(text);
+    return this._currentWidgets.map((item) => item.span).toList();
   }
+
+  /// 获得组件列表
+  List<TextSpanWidget> getWidgets() => this._currentWidgets;
 }
