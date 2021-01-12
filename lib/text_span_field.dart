@@ -9,9 +9,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
-import 'package:text_span_field/build_callback_types.dart';
 import 'package:text_span_field/text_span_builder.dart';
-import 'editable_text_span.dart';
+import 'custom/custom_editable_text.dart';
 export 'package:flutter/services.dart' show TextInputType, TextInputAction, TextCapitalization;
 
 /// Signature for the [TextSpanField.buildCounter] callback.
@@ -321,7 +320,6 @@ class TextSpanField extends StatefulWidget {
     this.buildCounter,
     this.scrollController,
     this.scrollPhysics,
-    this.widgetBuild,
     this.textSpanBuilder,
   })  : assert(textAlign != null),
         assert(readOnly != null),
@@ -360,9 +358,6 @@ class TextSpanField extends StatefulWidget {
                     paste: true,
                   )),
         super(key: key);
-
-  /// Custom Styles
-  final TextSpanWidgetGroupBuilder widgetBuild;
 
   /// Custom Builder
   final TextSpanBuilder textSpanBuilder;
@@ -936,7 +931,7 @@ class _TextSpanFieldState extends State<TextSpanField> implements TextSelectionG
         break;
     }
 
-    EditableTextSpan editableTextSpan = EditableTextSpan(
+    CustomEditableText editableTextSpan = CustomEditableText(
       builder: _textSpanBuilder,
       key: editableTextKey,
       readOnly: widget.readOnly,
@@ -983,7 +978,7 @@ class _TextSpanFieldState extends State<TextSpanField> implements TextSelectionG
       scrollPhysics: widget.scrollPhysics,
     );
 
-    _textSpanBuilder.bind(widgetBuild: widget.widgetBuild, textEditingController: this._controller, editableTextSpan: editableTextSpan);
+    _textSpanBuilder.bind(textEditingController: this._controller, editableTextSpan: editableTextSpan);
 
     Widget child = RepaintBoundary(child: editableTextSpan);
 

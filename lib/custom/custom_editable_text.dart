@@ -6,11 +6,11 @@ import 'package:text_span_field/text_span_builder.dart';
 /// 自定义文本编辑器
 /// 1. 重写 buildTextSpan 方法达到样式控制
 /// 2. 增加 style 属性达到动态样式控制
-class EditableTextSpan extends EditableText {
+class CustomEditableText extends EditableText {
   /// 构建器
   final TextSpanBuilder builder;
 
-  EditableTextSpan({
+  CustomEditableText({
     Key key,
     this.builder,
     @required controller,
@@ -120,7 +120,7 @@ class EditableTextSpan extends EditableText {
 
 class _EditableTextSpan extends EditableTextState {
   @override
-  EditableTextSpan get widget => super.widget;
+  CustomEditableText get widget => super.widget;
 
   @override
   TextSpan buildTextSpan() {

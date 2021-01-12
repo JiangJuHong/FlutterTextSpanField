@@ -1,35 +1,37 @@
 import 'package:flutter/material.dart';
-import 'package:text_span_field/build_callback_types.dart';
-import 'package:text_span_field/data/text_span_widget_builder.dart';
-import 'package:text_span_field/editable_text_span.dart';
+import 'package:text_span_field/custom/custom_editable_text.dart';
 
 import 'data/text_span_widget.dart';
 
 /// 构建器
 class TextSpanBuilder {
-  /// Widget构建属性列表
-  TextSpanWidgetGroupBuilder _widgetBuild;
-
   /// 文本域控制器
   TextEditingController _textEditingController;
 
   /// 文本编辑器
-  EditableTextSpan _editableTextSpan;
+  CustomEditableText _editableTextSpan;
 
   /// 当前组件列表
   List<TextSpanWidget> _currentWidgets = [];
 
-  /// 最后一次操作的问题
+  /// 自定义组件列表
+  List<TextSpanWidget> _customWidgets = [];
+
+  /// 最后一次操作的文本
   String _lastText = "";
+
+  /// 最后一次操作的光标
+  TextSelection _lastTextSelection = TextSelection(baseOffset: 0, extentOffset: 0);
+
+  /// 删除锁
+  bool _deleteLock = false;
 
   /// 绑定数据值组件
   void bind({
-    TextSpanWidgetGroupBuilder widgetBuild,
     TextEditingController textEditingController,
-    EditableTextSpan editableTextSpan,
+    CustomEditableText editableTextSpan,
   }) {
     if (this._textEditingController != null) this._textEditingController.removeListener(this._textControllerListener);
-    this._widgetBuild = widgetBuild;
     this._editableTextSpan = editableTextSpan;
     this._textEditingController = textEditingController;
     this._textEditingController.addListener(this._textControllerListener);
@@ -39,77 +41,63 @@ class TextSpanBuilder {
   _textControllerListener() {
     String text = this._textEditingController.text;
 
-    // 删除限制
-    if (this._lastText.length - text.length == 1) {
-      this._deleteLimit(this._currentWidgets);
+    // 正在执行删除时，不允许进行操作
+    if (_deleteLock) return;
+
+    // 删除控制
+    if (this._lastText.length > text.length) {
+      _deleteLock = true;
+      this._deleteLimit();
+      _deleteLock = false;
     }
-    this._lastText = text;
+
+    // 添加控制
+    if (this._lastText.length < text.length) {
+      this._addLimit();
+    }
+
+    // 更新上一次的文本和位置，此处必须重新取值，因为 _deleteLimit 等操作中可能会对值进行改变
+    this._lastText = this._textEditingController.text;
+    this._lastTextSelection = this._textEditingController.selection;
 
     // 光标位置限制
     this._cursorPositionLimit(this._currentWidgets);
   }
 
-  /// 根据文本创建组件构建列表，此操作会对用户传入进来Widget构建列表二次变更
-  /// [text] 当前的文本内容
-  List<TextSpanWidgetBuilder> _createTextSpanWidgetList(String text) {
-    var source = this._widgetBuild(text) ?? <TextSpanWidgetBuilder>[];
-
-    if (source.length == 0) {
-      return <TextSpanWidgetBuilder>[];
-    }
-
-    source.sort();
-    var result = new List<TextSpanWidgetBuilder>();
-    TextSpanWidgetBuilder prev;
-    for (var item in source) {
-      if (prev == null) {
-        // First item, check if we need one before it.
-        if (item.range.start > 0) {
-          result.add(TextSpanWidgetBuilder(range: TextRange(start: 0, end: item.range.start)));
-        }
-        result.add(item);
-        prev = item;
-        continue;
-      } else {
-        // Consequent item, check if there is a gap between.
-        if (prev.range.end > item.range.start) {
-          // Invalid ranges
-          throw new StateError('Invalid (intersecting) ranges for annotated field');
-        } else if (prev.range.end < item.range.start) {
-          result.add(TextSpanWidgetBuilder(range: TextRange(start: prev.range.end, end: item.range.start)));
-        }
-        // Also add current annotation
-        result.add(item);
-        prev = item;
-      }
-    }
-
-    // Also check for trailing range
-    if (result.last.range.end < text.length) {
-      result.add(TextSpanWidgetBuilder(range: TextRange(start: result.last.range.end, end: text.length)));
-    }
-    return result;
-  }
-
   /// 根据文本构建TextSpanWidget组件
   /// [text] 文本内容
   List<TextSpanWidget> _buildTextSpanWidget(String text) {
-    List<TextSpanWidgetBuilder> builder = this._createTextSpanWidgetList(text);
-    if (builder.length == 0) {
-      return [TextSpanWidget(range: TextRange(start: 0, end: text.length), span: TextSpan(text: text))];
+    // 没有节点就创建普通文本节点
+    if (this._customWidgets.length == 0) return [TextSpanWidget(range: TextRange(start: 0, end: text.length), span: TextSpan(text: text))];
+
+    // 初始化节点
+    List<TextSpanWidget> source = this._customWidgets;
+    List<TextSpanWidget> result = [];
+
+    // 节点排序，方便序列化
+    source.sort();
+
+    // 循环节点
+    TextRange prevItemRange = TextRange(start: 0, end: 0);
+    for (var item in source) {
+      TextRange itemRange = item.range;
+
+      // 如果前一个节点和当前节点有间隙，则创建普通组件
+      if (itemRange.start != prevItemRange.end) {
+        TextRange targetRange = TextRange(start: prevItemRange.end, end: itemRange.start);
+        result.add(TextSpanWidget(range: targetRange, span: TextSpan(text: targetRange.textInside(text))));
+      }
+
+      // 当前节点在文本范围内才进行添加
+      result.add(item);
+
+      prevItemRange = item.range;
     }
 
-    List<TextSpanWidget> result = [];
-    for (var item in builder) {
-      // 在范围内才进行添加
-      if (item.range.end <= text.length) {
-        String currentText = item.range.textInside(text);
-        InlineSpan span = TextSpan(text: currentText);
-        if (item.build != null) {
-          span = item.build(currentText);
-        }
-        result.add(TextSpanWidget(range: item.range, block: item.block, span: span));
-      }
+    // 如果最后一个节点和末尾有间隙，则进行增加
+    if (prevItemRange.end != text.length) {
+      TextRange targetRange = TextRange(start: prevItemRange.end, end: text.length);
+      result.add(TextSpanWidget(range: targetRange, span: TextSpan(text: targetRange.textInside(text))));
     }
     return result;
   }
@@ -138,27 +126,91 @@ class TextSpanBuilder {
   }
 
   /// 删除限制,如果组件是成块删除，则会自动删除整块内容
-  void _deleteLimit(List<TextSpanWidget> widget) {
+  void _deleteLimit() {
+    // 获得删除的内容的范围
+    TextRange deleteRange;
     TextSelection selection = this._textEditingController.selection;
-    for (var item in widget) {
-      // 非块组件不进行限制
-      if (item.block == null || !item.block) {
+    if (_lastTextSelection.baseOffset != _lastTextSelection.extentOffset) {
+      deleteRange = TextRange(start: _lastTextSelection.baseOffset, end: _lastTextSelection.extentOffset);
+    } else {
+      deleteRange = TextRange(start: selection.baseOffset, end: this._lastText.length == selection.baseOffset ? selection.baseOffset : selection.baseOffset + 1);
+    }
+
+    // 组件处理
+    // 如果组件在删除范围内，且是块组件，则一并删除
+    // 如果组件在受影响范围内，但是不是块组件，则更新组件的范围
+    List<int> removeIndex = [];
+    for (var i = 0; i < this._customWidgets.length; i++) {
+      print(i);
+      TextSpanWidget item = this._customWidgets[i];
+
+      // 检测是否在删除范围内
+      bool deleted = false;
+      for (var index = deleteRange.start; index <= deleteRange.end; index++) {
+        if (index > item.range.start && index < item.range.end) {
+          deleted = true;
+        }
+      }
+
+      // 删除组件后更新删除范围
+      if (deleted) {
+        removeIndex.add(i);
+        deleteRange = TextRange(start: item.range.start < deleteRange.start ? item.range.start : deleteRange.start, end: item.range.end > deleteRange.end ? item.range.end : deleteRange.end);
         continue;
       }
 
-      // 如果光标在块末尾位置，则代表删除的是当前块。然后移除块的内容
-      // 之所以需要 -1，是因为已经删除了一个字符，所以需要前移一位
-      if (item.range.end - 1 == selection.baseOffset) {
-        String newText = this._lastText.substring(item.range.end);
-        if (item.range.start != 0) {
-          newText = this._lastText.substring(0, item.range.start) + newText;
-        }
-        this._textEditingController.text = newText;
+      // 如果组件没有在删除范围内，则判断是否需要更新位置
+      // 如果删除的开始在组件末尾以后，则不需要更新
+      if (deleteRange.start >= item.range.end) {
+        continue;
+      }
 
-        // 重置光标到开始的位置
-        this._textEditingController.selection = TextSelection(baseOffset: item.range.start, extentOffset: item.range.start);
+      // 更新位置
+      item.range = _updateRange(item.range, -(deleteRange.end - deleteRange.start));
+      this._customWidgets[i] = item;
+    }
+
+    // 删除下标内容
+    removeIndex.forEach((index) => this._customWidgets.removeAt(index));
+
+    // 获得最新的文本和光标
+    String newText = this._lastText.replaceRange(deleteRange.start, deleteRange.end, "");
+    TextSelection newTextSelection = TextSelection(baseOffset: deleteRange.start, extentOffset: deleteRange.start);
+
+    // 更新文本和光标
+    this._textEditingController.value = this._textEditingController.value.copyWith(text: newText, selection: newTextSelection, composing: TextRange.empty);
+  }
+
+  /// 添加限制，添加内容时，应该同步更新组件的范围
+  void _addLimit() {
+    // 获得添加的内容长度
+    int length = this._textEditingController.text.length - this._lastText.length;
+
+    // 获得添加的内容的范围
+    TextSelection selection = this._textEditingController.selection;
+    TextRange appendRange = TextRange(start: selection.extentOffset - length, end: selection.extentOffset);
+
+    // -1代表光标没在文本框，则默认为是在末尾追加的内容，不进行处理
+    if (appendRange.start == -1 && appendRange.end == -1) {
+      return;
+    }
+
+    // 由于同时添加相同数量的内容，会导致
+    for (var i = 0; i < this._customWidgets.length; i++) {
+      TextSpanWidget item = this._customWidgets[i];
+      // 如果是在组件前面追加，则更新
+      if (appendRange.end <= item.range.start + (appendRange.end - appendRange.start)) {
+        item.range = _updateRange(item.range, appendRange.end - appendRange.start);
+        this._customWidgets[i] = item;
       }
     }
+  }
+
+  /// 更新范围
+  /// [source] 原始数据
+  /// [offset] 偏移量
+  TextRange _updateRange(TextRange source, int offset) {
+    return TextRange(start: source.start + offset, end: source.end + offset);
   }
 
   /// 计算光标位置
@@ -185,6 +237,55 @@ class TextSpanBuilder {
     return this._currentWidgets.map((item) => item.span).toList();
   }
 
+  /// 追加组件到末尾
+  void appendToEnd(TextSpan span) {
+    this.append(span, this._textEditingController.text.length);
+  }
+
+  /// 追加组件到光标处
+  void appendToCursor(TextSpan span) {
+    int index = this._lastTextSelection.start;
+    if (index == -1) {
+      this.appendToEnd(span);
+    } else {
+      this.append(span, index);
+    }
+  }
+
+  /// 在指定下标后面添加内容
+  void append(TextSpan span, int index) {
+    String oldText = this._textEditingController.text;
+    String editText = span.text;
+    String newText = oldText.substring(0, index) + editText + oldText.substring(index);
+
+    // 更新文本以及光标
+    this._textEditingController.value = this._textEditingController.value.copyWith(
+          text: newText,
+          selection: TextSelection.collapsed(offset: index + editText.length),
+          composing: TextRange.empty,
+        );
+
+    // 添加组件
+    this._customWidgets.add(TextSpanWidget(range: TextRange(start: index, end: index + editText.length), block: true, span: span));
+  }
+
+  /// 根据开始下标和结束下标对内容进行删除
+  void delete(int start, int end) {
+    // 移动光标到末尾
+    this._textEditingController.selection = TextSelection.collapsed(offset: end);
+
+    // 更新内容
+    String oldText = this._textEditingController.text;
+    this._textEditingController.value = this._textEditingController.value.copyWith(
+          text: oldText.substring(0, start) + oldText.substring(end),
+          selection: TextSelection.collapsed(offset: start),
+          composing: TextRange.empty,
+        );
+  }
+
   /// [公开方法] 获得组件列表
-  List<TextSpanWidget> getWidgets() => this._currentWidgets;
+  List<TextSpanWidget> getWidgets() => this._customWidgets;
+
+  /// [公开方法] 获得Controller
+  TextEditingController get controller => _textEditingController;
 }
