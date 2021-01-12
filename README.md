@@ -10,7 +10,7 @@
 # 什么是 TextSpanField ？
 Flutter自定义块样式输入框，实现在输入框中自定义加入任意 TextSpan，并可获得加入的 TextSpan对象。  
 通过此组件可以快速实现@功能值绑定，隐藏域值绑定！  
-如果您觉得这个插件帮助了您，可以请我[喝一杯咖啡](https://www.yuque.com/jiangjuhong/tencent-im-flutter/ygi582)
+如果您觉得这个插件帮助了您，可以请我[喝一杯咖啡](https://www.yuque.com/jiangjuhong/default/aso8g5)
 
 # 使用场景
 * @功能   (用户绑定ID，即使重名也能精确的知道@的是哪个用户)
@@ -31,7 +31,7 @@ Flutter自定义块样式输入框，实现在输入框中自定义加入任意 
 
 ### Flutter
 ```
-text_span_field: 1.0.0
+text_span_field: 2.0.0
 ```
 
 ### Android
