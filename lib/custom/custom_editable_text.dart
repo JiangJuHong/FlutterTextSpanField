@@ -124,6 +124,8 @@ class _EditableTextSpan extends EditableTextState {
 
   @override
   TextSpan buildTextSpan() {
-    return TextSpan(style: widget.style, children: widget.builder.buildSpan(textEditingValue.text));
+    return TextSpan(
+        style: widget.style,
+        children: widget.builder.buildSpan(textEditingValue.text));
   }
 }
