@@ -8,39 +8,51 @@
 
 
 # 什么是 TextSpanField ？
-Flutter自定义块样式输入框，实现在输入框中自定义加入任意 TextSpan，并可获得加入的 TextSpan对象。  
+
+Flutter自定义块样式输入框，实现在输入框中自定义加入任意 TextSpan，并可获得加入的
+TextSpan对象。  
 通过此组件可以快速实现@功能值绑定，隐藏域值绑定！  
 如果您觉得这个插件帮助了您，可以请我[喝一杯咖啡](https://www.yuque.com/jiangjuhong/default/aso8g5)
 
 # 使用场景
-* @功能   (用户绑定ID，即使重名也能精确的知道@的是哪个用户)
-* 隐藏域场景 (@一个用户，我们需要的实际是这个用户的ID，而不是用户名，通过此组件可以快速方便的实现)
+
+* @功能 (用户绑定ID，即使重名也能精确的知道@的是哪个用户)
+* 隐藏域场景
+  (@一个用户，我们需要的实际是这个用户的ID，而不是用户名，通过此组件可以快速方便的实现)
 
 # 使用限制
+
 * 自定义组件仅能以"块"的形式出现，即一删除会删除整块内容，光标也无法定位到整快组件中间，可参考QQ的@功能
-* 在存在自定义组件的情况下，禁止使用 controller.text 进行赋值，如果你不得不添加或删除内容，请使用 `append` 和 `delete` 方法
+* 在存在自定义组件的情况下，禁止使用 controller.text
+  进行赋值，如果你不得不添加或删除内容，请使用 `append` 和 `delete` 方法
 * 自定义组件仅支持 `TextSpan` 及其子类，不支持 `WidgetSpan`
 
 # 讨论群
+
 欢迎进入QQ群讨论，[点击此处可以直接加入群聊](https://jq.qq.com/?_wv=1027&k=QxCWMlUf)
 
 # Demo截图
+
 <img src="https://raw.githubusercontent.com/JiangJuHong/access-images/master/FlutterTextSpanField/WechatIMG160.jpeg" height="300em" style="max-width:100%;display: inline-block;"/>
 
 # 集成
 
 ### Flutter
+
 ```
 text_span_field: 2.0.0
 ```
 
 ### Android
+
 无需额外配置，已内部打入混淆配置
 
 ### IOS
+
 无需额外配置
 
 # 使用
+
 ```dart
 TextSpanField(
   maxLines: null,
@@ -51,6 +63,7 @@ TextSpanField(
   ),
 )
 ```
+
 其中，textSpanBuilder 属性为 TextSpanBuilder 对象，此对象包含以下公开接口:
 
 | 方法名          | 方法描述                            |
@@ -63,6 +76,7 @@ TextSpanField(
 | getWidgets     | 获得自定义组件列表                    |
 
 如果你要实现@功能的隐藏域，可以增加一个 AtTextSpan 类，并继承 TextSpan:
+
 ````dart
 /// At功能的TextSpan
 class AtTextSpan extends TextSpan {
@@ -79,12 +93,17 @@ class AtTextSpan extends TextSpan {
   }) : super(text: text, children: children, style: style, recognizer: recognizer, semanticsLabel: semanticsLabel);
 }
 ````
-然后在@的时候通过 appendToCursor 接口添加到编辑器，最后在获得值的时候调用 getWidgets 接口即可:  
+
+然后在@的时候通过 appendToCursor 接口添加到编辑器，最后在获得值的时候调用
+getWidgets 接口即可:  
 添加：
+
 ````dart
  _textSpanBuilder.appendToCursor(AtTextSpan(id:"我是ID", text: "我是昵称", style: TextStyle(color: Color(0xFF5BA2FF))));
 ````
+
 获取：
+
 ````dart
 List<TextSpanWidget> widget = this._textSpanBuilder.getWidgets();
 widget.forEach((element) {
