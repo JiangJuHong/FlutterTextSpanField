@@ -30,7 +30,8 @@ class TextSpanBuilder {
     if (this._textEditingController != null)
       this._textEditingController.removeListener(this._textControllerListener);
     this._textEditingController = textEditingController;
-    this._textEditingController.addListener(this._textControllerListener);
+    if (this._textEditingController != null)
+      this._textEditingController.addListener(this._textControllerListener);
   }
 
   /// 控制器监听器
@@ -277,6 +278,11 @@ class TextSpanBuilder {
     this.append(span, this._textEditingController.text.length);
   }
 
+  /// 追加普通文本到末尾
+  void appendTextToEnd(String text) {
+    this.appendText(text, this._textEditingController.text.length);
+  }
+
   /// 追加组件到光标处
   void appendToCursor(TextSpan span) {
     int index = this._lastTextSelection.start;
@@ -287,28 +293,43 @@ class TextSpanBuilder {
     }
   }
 
+  /// 追加普通文本到光标处
+  void appendTextToCursor(String text) {
+    int index = this._lastTextSelection.start;
+    if (index == -1) {
+      this.appendTextToEnd(text);
+    } else {
+      this.appendText(text, index);
+    }
+  }
+
   /// 在指定下标后面添加内容
   void append(TextSpan span, int index) {
-    String oldText = this._textEditingController.text;
-    String editText = span.text;
-    String newText =
-        oldText.substring(0, index) + editText + oldText.substring(index);
+    String text = span.text ?? "";
 
-    // 更新文本以及光标
-    this._textEditingController.value = this
-        ._textEditingController
-        .value
-        .copyWith(
-          text: newText,
-          selection: TextSelection.collapsed(offset: index + editText.length),
-          composing: TextRange.empty,
-        );
+    // 增加普通文本
+    this.appendText(text, index);
 
     // 添加组件
     this._customWidgets.add(TextSpanWidget(
-        range: TextRange(start: index, end: index + editText.length),
+        range: TextRange(start: index, end: index + text.length),
         block: true,
         span: span));
+  }
+
+  /// 追加普通文本
+  /// [text] 文本内容
+  void appendText(String text, int index) {
+    String oldText = this._textEditingController.text;
+    String newText =
+        oldText.substring(0, index) + text + oldText.substring(index);
+
+    this._textEditingController.value =
+        this._textEditingController.value.copyWith(
+              text: newText,
+              selection: TextSelection.collapsed(offset: index + text.length),
+              composing: TextRange.empty,
+            );
   }
 
   /// 根据开始下标和结束下标对内容进行删除
@@ -325,6 +346,15 @@ class TextSpanBuilder {
               selection: TextSelection.collapsed(offset: start),
               composing: TextRange.empty,
             );
+  }
+
+  /// 清空文本
+  void clear() {
+    String oldText = this._textEditingController.text;
+    if (oldText.length == 0) {
+      return;
+    }
+    this.delete(0, oldText.length);
   }
 
   /// [公开方法] 获得组件列表

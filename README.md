@@ -66,14 +66,18 @@ TextSpanField(
 
 其中，textSpanBuilder 属性为 TextSpanBuilder 对象，此对象包含以下公开接口:
 
-| 方法名          | 方法描述                            |
-|:---------------|:-----------------------------------|
-| buildSpan      | 根据文本和自定义组件构建InlineSpan列表 |
-| appendToEnd    | 追加自定义的 TextSpan 组件到末尾      |
-| appendToCursor | 追加自定义的 TextSpan 组件到光标位置   |
-| append         | 追加自定义的 TextSpan 组件到指定下标   |
-| delete         | 根据开始下标和结束下标删除文本内容      |
-| getWidgets     | 获得自定义组件列表                    |
+| 方法名              | 方法描述                            |
+|:-------------------|:-----------------------------------|
+| buildSpan          | 根据文本和自定义组件构建InlineSpan列表 |
+| appendToEnd        | 追加自定义的 TextSpan 组件到末尾      |
+| appendTextToEnd    | 追加普通文本到末尾                    |
+| appendToCursor     | 追加自定义的 TextSpan 组件到光标位置   |
+| appendTextToCursor | 追加普通文本光标位置                  |
+| append             | 追加自定义的 TextSpan 组件到指定下标   |
+| appendText         | 追加普通文本指定下标                  |
+| delete             | 根据开始下标和结束下标删除文本内容      |
+| clear              | 清空文本内容                         |
+| getWidgets         | 获得自定义组件列表                    |
 
 如果你要实现@功能的隐藏域，可以增加一个 AtTextSpan 类，并继承 TextSpan:
 
