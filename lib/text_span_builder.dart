@@ -121,6 +121,11 @@ class TextSpanBuilder {
         continue;
       }
 
+      // 组件只有一个字符时不进行限制
+      if (item.span.text.length <= 1) {
+        continue;
+      }
+
       // 获得新的选择器位置
       int start = this._calculationCursorPosition(
           item.range, selection.baseOffset, text.length);
@@ -158,14 +163,16 @@ class TextSpanBuilder {
     // 如果组件在受影响范围内，但是不是块组件，则更新组件的范围
     List<int> removeIndex = [];
     for (var i = 0; i < this._customWidgets.length; i++) {
-      print(i);
       TextSpanWidget item = this._customWidgets[i];
 
       // 检测是否在删除范围内
-      bool deleted = false;
-      for (var index = deleteRange.start; index <= deleteRange.end; index++) {
-        if (index > item.range.start && index < item.range.end) {
-          deleted = true;
+      bool deleted = item.range.start == deleteRange.start &&
+          item.range.end == deleteRange.end;
+      if (!deleted) {
+        for (var index = deleteRange.start; index <= deleteRange.end; index++) {
+          if (index > item.range.start && index < item.range.end) {
+            deleted = true;
+          }
         }
       }
 

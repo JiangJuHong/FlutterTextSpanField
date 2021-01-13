@@ -37,14 +37,6 @@ class _MyAppState extends State<MyApp> {
 
   /// @用户按钮点击事件
   _atUser() async {
-    if (_name == '') {
-      _name = "张三";
-    }
-
-    if (_id == '') {
-      _id = "100001";
-    }
-
     _textSpanBuilder.appendToCursor(AtTextSpan(
         id: _id, text: "@$_name", style: TextStyle(color: Color(0xFF5BA2FF))));
   }
