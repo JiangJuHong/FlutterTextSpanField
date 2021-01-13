@@ -1054,7 +1054,7 @@ class _TextSpanFieldState extends State<TextSpanField>
       scrollPhysics: widget.scrollPhysics,
     );
 
-    _textSpanBuilder.bind(textEditingController: this._controller);
+    _textSpanBuilder.bind(textEditingController: controller);
 
     Widget child = RepaintBoundary(child: editableTextSpan);
 
