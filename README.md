@@ -40,7 +40,7 @@ TextSpan对象。
 ### Flutter
 
 ```
-text_span_field: 2.0.0
+text_span_field: 最新版本
 ```
 
 ### Android
