@@ -291,17 +291,23 @@ class TextSpanBuilder {
         );
   }
 
-  /// 根据开始下标和结束下标对内容进行删除
+  /// 根据文本范围对内容进行删除
+  /// [start] 开始范围，可以理解为开始下标
+  /// [end] 结束范围，可以理解为要删除的长度
   void delete(int start, int end) {
+    // 获得旧文本
+    String oldText = this._textEditingController.text;
+    int startIndex = start > oldText.length ? oldText.length : start;
+    int endIndex = end > oldText.length ? oldText.length : end;
+
     // 选中删除的内容
-    this._textEditingController.selection = TextSelection(baseOffset: start, extentOffset: end);
+    this._textEditingController.selection = TextSelection(baseOffset: startIndex, extentOffset: endIndex);
 
     // 更新内容
-    String oldText = this._textEditingController.text;
-    String newText = oldText.substring(0, start) + oldText.substring(end);
+    String newText = oldText.substring(0, startIndex) + oldText.substring(endIndex);
     this._textEditingController.value = this._textEditingController.value.copyWith(
           text: newText,
-          selection: TextSelection.collapsed(offset: start),
+          selection: TextSelection.collapsed(offset: startIndex),
           composing: TextRange.empty,
         );
   }
