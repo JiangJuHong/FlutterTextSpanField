@@ -37,13 +37,17 @@ class _MyAppState extends State<MyApp> {
 
   /// @用户按钮点击事件
   _atUser() async {
-    _textSpanBuilder.appendToCursor(AtTextSpan(
-        id: _id, text: "@$_name", style: TextStyle(color: Color(0xFF5BA2FF))));
+    _textSpanBuilder.appendToCursor(AtTextSpan(id: _id, text: "@$_name", style: TextStyle(color: Color(0xFF5BA2FF))));
   }
 
   /// 删除按钮点击事件
   _delete() {
     _textSpanBuilder.delete(_startIndex, _endIndex);
+  }
+
+  /// 清空按钮点击事件
+  _clear() {
+    _textSpanBuilder.clear();
   }
 
   /// 获取值按钮点击事件
@@ -99,8 +103,7 @@ class _MyAppState extends State<MyApp> {
                       ),
                     ),
                     Expanded(
-                      child: RaisedButton(
-                          onPressed: () => this._atUser(), child: Text("@用户")),
+                      child: RaisedButton(onPressed: () => this._atUser(), child: Text("@用户")),
                     ),
                   ],
                 ),
@@ -121,8 +124,10 @@ class _MyAppState extends State<MyApp> {
                       ),
                     ),
                     Expanded(
-                      child: RaisedButton(
-                          onPressed: () => this._delete(), child: Text("删除下标")),
+                      child: RaisedButton(onPressed: () => this._delete(), child: Text("删除下标")),
+                    ),
+                    Expanded(
+                      child: RaisedButton(onPressed: () => this._clear(), child: Text("清空")),
                     ),
                   ],
                 ),
@@ -150,10 +155,5 @@ class AtTextSpan extends TextSpan {
     TextStyle style,
     GestureRecognizer recognizer,
     String semanticsLabel,
-  }) : super(
-            text: text,
-            children: children,
-            style: style,
-            recognizer: recognizer,
-            semanticsLabel: semanticsLabel);
+  }) : super(text: text, children: children, style: style, recognizer: recognizer, semanticsLabel: semanticsLabel);
 }

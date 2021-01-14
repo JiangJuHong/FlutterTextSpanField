@@ -17,8 +17,7 @@ class TextSpanBuilder {
   String _lastText = "";
 
   /// 最后一次操作的光标
-  TextSelection _lastTextSelection =
-      TextSelection(baseOffset: 0, extentOffset: 0);
+  TextSelection _lastTextSelection = TextSelection(baseOffset: 0, extentOffset: 0);
 
   /// 删除锁
   bool _deleteLock = false;
@@ -27,11 +26,9 @@ class TextSpanBuilder {
   void bind({
     TextEditingController textEditingController,
   }) {
-    if (this._textEditingController != null)
-      this._textEditingController.removeListener(this._textControllerListener);
+    if (this._textEditingController != null) this._textEditingController.removeListener(this._textControllerListener);
     this._textEditingController = textEditingController;
-    if (this._textEditingController != null)
-      this._textEditingController.addListener(this._textControllerListener);
+    if (this._textEditingController != null) this._textEditingController.addListener(this._textControllerListener);
   }
 
   /// 控制器监听器
@@ -65,12 +62,7 @@ class TextSpanBuilder {
   /// [text] 文本内容
   List<TextSpanWidget> _buildTextSpanWidget(String text) {
     // 没有节点就创建普通文本节点
-    if (this._customWidgets.length == 0)
-      return [
-        TextSpanWidget(
-            range: TextRange(start: 0, end: text.length),
-            span: TextSpan(text: text))
-      ];
+    if (this._customWidgets.length == 0) return [TextSpanWidget(range: TextRange(start: 0, end: text.length), span: TextSpan(text: text))];
 
     // 初始化节点
     List<TextSpanWidget> source = this._customWidgets;
@@ -86,11 +78,8 @@ class TextSpanBuilder {
 
       // 如果前一个节点和当前节点有间隙，则创建普通组件
       if (itemRange.start != prevItemRange.end) {
-        TextRange targetRange =
-            TextRange(start: prevItemRange.end, end: itemRange.start);
-        result.add(TextSpanWidget(
-            range: targetRange,
-            span: TextSpan(text: targetRange.textInside(text))));
+        TextRange targetRange = TextRange(start: prevItemRange.end, end: itemRange.start);
+        result.add(TextSpanWidget(range: targetRange, span: TextSpan(text: targetRange.textInside(text))));
       }
 
       // 当前节点在文本范围内才进行添加
@@ -101,11 +90,8 @@ class TextSpanBuilder {
 
     // 如果最后一个节点和末尾有间隙，则进行增加
     if (prevItemRange.end != text.length) {
-      TextRange targetRange =
-          TextRange(start: prevItemRange.end, end: text.length);
-      result.add(TextSpanWidget(
-          range: targetRange,
-          span: TextSpan(text: targetRange.textInside(text))));
+      TextRange targetRange = TextRange(start: prevItemRange.end, end: text.length);
+      result.add(TextSpanWidget(range: targetRange, span: TextSpan(text: targetRange.textInside(text))));
     }
     return result;
   }
@@ -127,15 +113,12 @@ class TextSpanBuilder {
       }
 
       // 获得新的选择器位置
-      int start = this._calculationCursorPosition(
-          item.range, selection.baseOffset, text.length);
-      int end = this._calculationCursorPosition(
-          item.range, selection.extentOffset, text.length);
+      int start = this._calculationCursorPosition(item.range, selection.baseOffset, text.length);
+      int end = this._calculationCursorPosition(item.range, selection.extentOffset, text.length);
 
       // 如果位置发生改变，则进行应用
       if (start != selection.baseOffset || end != selection.extentOffset) {
-        this._textEditingController.selection =
-            TextSelection(baseOffset: start, extentOffset: end);
+        this._textEditingController.selection = TextSelection(baseOffset: start, extentOffset: end);
         break;
       }
     }
@@ -147,15 +130,9 @@ class TextSpanBuilder {
     TextRange deleteRange;
     TextSelection selection = this._textEditingController.selection;
     if (_lastTextSelection.baseOffset != _lastTextSelection.extentOffset) {
-      deleteRange = TextRange(
-          start: _lastTextSelection.baseOffset,
-          end: _lastTextSelection.extentOffset);
+      deleteRange = TextRange(start: _lastTextSelection.baseOffset, end: _lastTextSelection.extentOffset);
     } else {
-      deleteRange = TextRange(
-          start: selection.baseOffset,
-          end: this._lastText.length == selection.baseOffset
-              ? selection.baseOffset
-              : selection.baseOffset + 1);
+      deleteRange = TextRange(start: selection.baseOffset, end: this._lastText.length == selection.baseOffset ? selection.baseOffset : selection.baseOffset + 1);
     }
 
     // 组件处理
@@ -166,8 +143,7 @@ class TextSpanBuilder {
       TextSpanWidget item = this._customWidgets[i];
 
       // 检测是否在删除范围内
-      bool deleted = item.range.start == deleteRange.start &&
-          item.range.end == deleteRange.end;
+      bool deleted = item.range.start == deleteRange.start && item.range.end == deleteRange.end;
       if (!deleted) {
         for (var index = deleteRange.start; index <= deleteRange.end; index++) {
           if (index > item.range.start && index < item.range.end) {
@@ -179,13 +155,7 @@ class TextSpanBuilder {
       // 删除组件后更新删除范围
       if (deleted) {
         removeIndex.add(i);
-        deleteRange = TextRange(
-            start: item.range.start < deleteRange.start
-                ? item.range.start
-                : deleteRange.start,
-            end: item.range.end > deleteRange.end
-                ? item.range.end
-                : deleteRange.end);
+        deleteRange = TextRange(start: item.range.start < deleteRange.start ? item.range.start : deleteRange.start, end: item.range.end > deleteRange.end ? item.range.end : deleteRange.end);
         continue;
       }
 
@@ -196,8 +166,7 @@ class TextSpanBuilder {
       }
 
       // 更新位置
-      item.range =
-          _updateRange(item.range, -(deleteRange.end - deleteRange.start));
+      item.range = _updateRange(item.range, -(deleteRange.end - deleteRange.start));
       this._customWidgets[i] = item;
     }
 
@@ -205,31 +174,21 @@ class TextSpanBuilder {
     removeIndex.forEach((index) => this._customWidgets.removeAt(index));
 
     // 获得最新的文本和光标
-    String newText =
-        this._lastText.replaceRange(deleteRange.start, deleteRange.end, "");
-    TextSelection newTextSelection = TextSelection(
-        baseOffset: deleteRange.start, extentOffset: deleteRange.start);
+    String newText = this._lastText.replaceRange(deleteRange.start, deleteRange.end, "");
+    TextSelection newTextSelection = TextSelection(baseOffset: deleteRange.start, extentOffset: deleteRange.start);
 
     // 更新文本和光标
-    this._textEditingController.value = this
-        ._textEditingController
-        .value
-        .copyWith(
-            text: newText,
-            selection: newTextSelection,
-            composing: TextRange.empty);
+    this._textEditingController.value = this._textEditingController.value.copyWith(text: newText, selection: newTextSelection, composing: TextRange.empty);
   }
 
   /// 添加限制，添加内容时，应该同步更新组件的范围
   void _addLimit() {
     // 获得添加的内容长度
-    int length =
-        this._textEditingController.text.length - this._lastText.length;
+    int length = this._textEditingController.text.length - this._lastText.length;
 
     // 获得添加的内容的范围
     TextSelection selection = this._textEditingController.selection;
-    TextRange appendRange = TextRange(
-        start: selection.extentOffset - length, end: selection.extentOffset);
+    TextRange appendRange = TextRange(start: selection.extentOffset - length, end: selection.extentOffset);
 
     // -1代表光标没在文本框，则默认为是在末尾追加的内容，不进行处理
     if (appendRange.start == -1 && appendRange.end == -1) {
@@ -240,10 +199,8 @@ class TextSpanBuilder {
     for (var i = 0; i < this._customWidgets.length; i++) {
       TextSpanWidget item = this._customWidgets[i];
       // 如果是在组件前面追加，则更新
-      if (appendRange.end <=
-          item.range.start + (appendRange.end - appendRange.start)) {
-        item.range =
-            _updateRange(item.range, appendRange.end - appendRange.start);
+      if (appendRange.end <= item.range.start + (appendRange.end - appendRange.start)) {
+        item.range = _updateRange(item.range, appendRange.end - appendRange.start);
         this._customWidgets[i] = item;
       }
     }
@@ -318,41 +275,35 @@ class TextSpanBuilder {
     this.appendText(text, index);
 
     // 添加组件
-    this._customWidgets.add(TextSpanWidget(
-        range: TextRange(start: index, end: index + text.length),
-        block: true,
-        span: span));
+    this._customWidgets.add(TextSpanWidget(range: TextRange(start: index, end: index + text.length), block: true, span: span));
   }
 
   /// 追加普通文本
   /// [text] 文本内容
   void appendText(String text, int index) {
     String oldText = this._textEditingController.text;
-    String newText =
-        oldText.substring(0, index) + text + oldText.substring(index);
+    String newText = oldText.substring(0, index) + text + oldText.substring(index);
 
-    this._textEditingController.value =
-        this._textEditingController.value.copyWith(
-              text: newText,
-              selection: TextSelection.collapsed(offset: index + text.length),
-              composing: TextRange.empty,
-            );
+    this._textEditingController.value = this._textEditingController.value.copyWith(
+          text: newText,
+          selection: TextSelection.collapsed(offset: index + text.length),
+          composing: TextRange.empty,
+        );
   }
 
   /// 根据开始下标和结束下标对内容进行删除
   void delete(int start, int end) {
-    // 移动光标到末尾
-    this._textEditingController.selection =
-        TextSelection.collapsed(offset: end);
+    // 选中删除的内容
+    this._textEditingController.selection = TextSelection(baseOffset: start, extentOffset: end);
 
     // 更新内容
     String oldText = this._textEditingController.text;
-    this._textEditingController.value =
-        this._textEditingController.value.copyWith(
-              text: oldText.substring(0, start) + oldText.substring(end),
-              selection: TextSelection.collapsed(offset: start),
-              composing: TextRange.empty,
-            );
+    String newText = oldText.substring(0, start) + oldText.substring(end);
+    this._textEditingController.value = this._textEditingController.value.copyWith(
+          text: newText,
+          selection: TextSelection.collapsed(offset: start),
+          composing: TextRange.empty,
+        );
   }
 
   /// 清空文本
