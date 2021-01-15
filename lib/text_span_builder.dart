@@ -57,6 +57,7 @@ class TextSpanBuilder {
   /// [newSelection] 新的文本光标
   _textChangeListener(String oldText, String newText, TextSelection oldSelection, TextSelection newSelection) {
     // 如果是替换
+    print(oldText + " -- " + newText);
 
     // 如果是删除
     if (oldText.length > newText.length) {
@@ -155,6 +156,8 @@ class TextSpanBuilder {
   /// [oldSelection] 旧的文本光标
   /// [newSelection] 新的文本光标
   void _addLimit(String oldText, String newText, TextSelection oldSelection, TextSelection newSelection) {
+    if (this._customWidgets.length == 0) return;
+
     // 获得添加的内容长度
     int length = newText.length - oldText.length;
 
