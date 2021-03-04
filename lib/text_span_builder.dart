@@ -43,6 +43,11 @@ class TextSpanBuilder {
       this._textChangeListener(oldText, text, oldSelection, selection);
     }
 
+    // 文本变化可能会修改 _lastTextSelection 和 _textEditingController.selection
+    // 需重新赋值
+    oldSelection = this._lastTextSelection;
+    selection = this._textEditingController.selection;
+
     // 光标变化
     if (oldSelection.start != selection.start || oldSelection.end != selection.end) {
       this._lastTextSelection = selection;
@@ -56,8 +61,13 @@ class TextSpanBuilder {
   /// [oldSelection] 旧的文本光标
   /// [newSelection] 新的文本光标
   _textChangeListener(String oldText, String newText, TextSelection oldSelection, TextSelection newSelection) {
-    // 如果是替换
-    print(oldText + " -- " + newText);
+    // print(oldText + " -- " + newText);
+
+    // 如果是选中粘贴
+    if (oldSelection.start != oldSelection.end) {
+      this._pasteLimit(oldText, newText, oldSelection, newSelection);
+      return;
+    }
 
     // 如果是删除
     if (oldText.length > newText.length) {
@@ -79,6 +89,32 @@ class TextSpanBuilder {
     this._cursorPositionLimit(oldText, newText, oldSelection, newSelection);
   }
 
+  /// 替换限制，如果选中一段并粘贴，则会自动删除选中区域里的整块内容
+  /// [oldText] 旧文本
+  /// [newText] 新文本
+  /// [oldSelection] 旧的文本光标
+  /// [newSelection] 新的文本光标
+  void _pasteLimit(String oldText, String newText, TextSelection oldSelection, TextSelection newSelection) {
+    // 组件处理，如果组件在删除范围内，则把整块内容进行删除。
+    // 如果组件不在删除范围内，但是在受影响范围内，则更新组件最新下标。
+    List<int> removeIndex = [];
+    for (var i = 0; i < this._customWidgets.length; i++) {
+      TextSpanWidget item = this._customWidgets[i];
+      TextRange range = item.range;
+
+      // 检测是否在删除范围内
+      if (range.start >= oldSelection.start && range.end <= oldSelection.end) {
+        removeIndex.add(i);
+      } else if (range.start >= oldSelection.end) {
+        // 删除范围之后的需更新整块内容的位置
+        item.range = _updateRange(item.range, newText.length - oldText.length);
+      }
+    }
+
+    // 删除下标内容
+    removeIndex.reversed.forEach((index) => this._customWidgets.removeAt(index));
+  }
+
   /// 删除限制,如果组件是成块删除，则会自动删除整块内容
   /// [oldText] 旧文本
   /// [newText] 新文本
@@ -92,7 +128,7 @@ class TextSpanBuilder {
     if (oldSelection.baseOffset != oldSelection.extentOffset) {
       deleteRange = TextRange(start: oldSelection.baseOffset, end: oldSelection.extentOffset);
     } else {
-      deleteRange = TextRange(start: newSelection.baseOffset, end: oldText.length == newSelection.baseOffset ? newSelection.baseOffset : newSelection.baseOffset + 1);
+      deleteRange = TextRange(start: newSelection.baseOffset, end: oldText.length == newSelection.baseOffset ? newSelection.baseOffset : newSelection.baseOffset + oldText.length - newText.length);
     }
 
     // 组件处理，如果组件在删除范围内，则把整块内容进行删除。如果组件不在删除范围内，但是在受影响范围内，则更新组件最新下标。
@@ -132,11 +168,12 @@ class TextSpanBuilder {
     }
 
     // 删除下标内容
-    removeIndex.forEach((index) => this._customWidgets.removeAt(index));
+    removeIndex.reversed.forEach((index) => this._customWidgets.removeAt(index));
 
     // 获得最终的的文本和光标
-    String finalText = oldText.replaceRange(deleteRange.start, deleteRange.end, "");
-    TextSelection finalTextSelection = TextSelection(baseOffset: deleteRange.start, extentOffset: deleteRange.start);
+    // 保存最终文本和光标位置，防止删除块内容时触发两次内容更新
+    String finalText = this._lastText = oldText.replaceRange(deleteRange.start, deleteRange.end, "");
+    TextSelection finalTextSelection = this._lastTextSelection = TextSelection(baseOffset: deleteRange.start, extentOffset: deleteRange.start);
 
     // 内容相同则不进行更新
     if (!changed || finalText == newText) {
