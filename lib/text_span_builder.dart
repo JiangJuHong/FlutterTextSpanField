@@ -356,6 +356,7 @@ class TextSpanBuilder {
 
   /// 清空文本
   void clear() {
+    this._customWidgets.clear();
     String oldText = this._textEditingController.text;
     if (oldText.length == 0) {
       return;
