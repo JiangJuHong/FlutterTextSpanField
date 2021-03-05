@@ -1,14 +1,13 @@
-<p align="center">
-<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-2-orange.svg?style=flat-square)](#contributors-)
-<!-- ALL-CONTRIBUTORS-BADGE:END -->
-    <a href="https://pub.dartlang.org/packages/text_span_field"><img src="https://img.shields.io/pub/v/text_span_field.svg"/></a>
-    &nbsp;
-    <a href="https://www.apache.org/licenses/LICENSE-2.0"><img src="https://img.shields.io/github/license/JiangJuHong/FlutterTencentImPlugin"/></a>
-    &nbsp;
-    <a href="https://jq.qq.com/?_wv=1027&k=QxCWMlUf"><img src="https://img.shields.io/badge/qq群-850923396-1"/></a>
-</p>
 
+
+<div align="center">
+
+[![All Contributors](https://img.shields.io/badge/all_contributors-2-orange.svg?style=flat-square)](#contributors-)
+[![](https://img.shields.io/pub/v/text_span_field.svg)](https://pub.dartlang.org/packages/text_span_field)
+[![](https://img.shields.io/github/license/JiangJuHong/FlutterTencentImPlugin)](https://www.apache.org/licenses/LICENSE-2.0)
+[![](https://img.shields.io/badge/qq群-850923396-1)](https://jq.qq.com/?_wv=1027&k=QxCWMlUf)
+
+</div>
 
 # 什么是 TextSpanField ？
 
@@ -141,11 +140,13 @@ widget.forEach((element) {
 
 ## Contributors ✨
 
-Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
+Thanks goes to these wonderful people
+([emoji key](https://allcontributors.org/docs/en/emoji-key)):
 
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
 <!-- prettier-ignore-start -->
 <!-- markdownlint-disable -->
+
 <table>
   <tr>
     <td align="center"><a href="https://github.com/wenboLee"><img src="https://avatars.githubusercontent.com/u/16222902?v=4?s=100" width="100px;" alt=""/><br /><sub><b>wenbo_lee</b></sub></a><br /><a href="https://github.com/JiangJuHong/FlutterTextSpanField/commits?author=wenboLee" title="Code">💻</a></td>
@@ -158,4 +159,6 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
-This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
+This project follows the
+[all-contributors](https://github.com/all-contributors/all-contributors)
+specification. Contributions of any kind welcome!
