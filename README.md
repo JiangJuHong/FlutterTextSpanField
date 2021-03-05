@@ -1,6 +1,6 @@
 <p align="center">
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-2-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
     <a href="https://pub.dartlang.org/packages/text_span_field"><img src="https://img.shields.io/pub/v/text_span_field.svg"/></a>
     &nbsp;
@@ -149,6 +149,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 <table>
   <tr>
     <td align="center"><a href="https://github.com/wenboLee"><img src="https://avatars.githubusercontent.com/u/16222902?v=4?s=100" width="100px;" alt=""/><br /><sub><b>wenbo_lee</b></sub></a><br /><a href="https://github.com/JiangJuHong/FlutterTextSpanField/commits?author=wenboLee" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/ConanXie"><img src="https://avatars.githubusercontent.com/u/10040846?v=4?s=100" width="100px;" alt=""/><br /><sub><b>xiejie</b></sub></a><br /><a href="https://github.com/JiangJuHong/FlutterTextSpanField/commits?author=ConanXie" title="Code">💻</a></td>
   </tr>
 </table>
 
