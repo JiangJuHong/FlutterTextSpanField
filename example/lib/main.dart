@@ -30,10 +30,6 @@ class _MyAppState extends State<MyApp> {
   /// 显示的值内容
   String _valueContent = "";
 
-  TextEditingController _controller = TextEditingController();
-
-  TextEditingController _emoji = TextEditingController();
-
   @override
   void initState() {
     super.initState();
@@ -41,7 +37,8 @@ class _MyAppState extends State<MyApp> {
 
   /// @用户按钮点击事件
   _atUser() async {
-    _textSpanBuilder.appendToCursor(AtTextSpan(id: _id, text: "@$_name", style: TextStyle(color: Color(0xFF5BA2FF))));
+    _textSpanBuilder.appendToCursor(AtTextSpan(
+        id: _id, text: "@$_name", style: TextStyle(color: Color(0xFF5BA2FF))));
   }
 
   /// 删除按钮点击事件
@@ -77,85 +74,72 @@ class _MyAppState extends State<MyApp> {
         appBar: AppBar(
           title: const Text('Plugin example app'),
         ),
-        body: SingleChildScrollView(
-          child: Column(
-            children: [
-              TextSpanField(
-                maxLines: null,
-                textSpanBuilder: _textSpanBuilder,
-                onChanged: (text){
-                  setState(() {
-                    print("text:  $text");
-                    _getValue();
-                  });
-                },
-                decoration: InputDecoration(
-                  contentPadding: EdgeInsets.all(20),
-                  hintText: '分享你的点滴，记录这一刻...',
+        body: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Center(
+            child: Column(
+              children: [
+                TextSpanField(
+                  maxLines: null,
+                  textSpanBuilder: _textSpanBuilder,
+                  decoration: InputDecoration(
+                    contentPadding: EdgeInsets.all(20),
+                    hintText: '分享你的点滴，记录这一刻...',
+                  ),
                 ),
-              ),
-              Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: TextEditingController(text: _name),
-                      decoration: InputDecoration(hintText: '请输入要@的昵称'),
-                      onChanged: (text) => this._name = text,
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: TextEditingController(text: _name),
+                        decoration: InputDecoration(hintText: '请输入要@的昵称'),
+                        onChanged: (text) => this._name = text,
+                      ),
                     ),
-                  ),
-                  Expanded(
-                    child: TextField(
-                      controller: TextEditingController(text: _id),
-                      decoration: InputDecoration(hintText: '请输入要@的ID'),
-                      onChanged: (text) => this._id = text,
+                    Expanded(
+                      child: TextField(
+                        controller: TextEditingController(text: _id),
+                        decoration: InputDecoration(hintText: '请输入要@的ID'),
+                        onChanged: (text) => this._id = text,
+                      ),
                     ),
-                  ),
-                  Expanded(
-                    child: RaisedButton(onPressed: () => this._atUser(), child: Text("@用户")),
-                  ),
-                ],
-              ),
-              Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: TextEditingController(text: "$_startIndex"),
-                      decoration: InputDecoration(hintText: '删除的开始'),
-                      onChanged: (text) => this._startIndex = int.parse(text),
+                    Expanded(
+                      child: RaisedButton(
+                          onPressed: () => this._atUser(), child: Text("@用户")),
                     ),
-                  ),
-                  Expanded(
-                    child: TextField(
-                      controller: TextEditingController(text: "$_endIndex"),
-                      decoration: InputDecoration(hintText: '删除的结束下标'),
-                      onChanged: (text) => this._endIndex = int.parse(text),
+                  ],
+                ),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: TextEditingController(text: "$_startIndex"),
+                        decoration: InputDecoration(hintText: '删除的开始'),
+                        onChanged: (text) => this._startIndex = int.parse(text),
+                      ),
                     ),
-                  ),
-                  Expanded(
-                    child: RaisedButton(onPressed: () => this._delete(), child: Text("删除下标")),
-                  ),
-                  Expanded(
-                    child: RaisedButton(onPressed: () => this._clear(), child: Text("清空")),
-                  ),
-                ],
-              ),
-              RaisedButton(onPressed: this._getValue, child: Text("获取值")),
-              Container(height: 10),
-              Text(_valueContent),
-              Container(height: 10),
-              TextField(
-                controller: _emoji,
-                onChanged: (text) {
-                  setState(() {
-                    print("text:  $text");
-                  });
-                },
-              ),
-              Text(_emoji.text),
-              Text(_valueContent),
-              RichText(text: TextSpan(text: _emoji.text)),
-              RichText(text: TextSpan(text: _valueContent)),
-            ],
+                    Expanded(
+                      child: TextField(
+                        controller: TextEditingController(text: "$_endIndex"),
+                        decoration: InputDecoration(hintText: '删除的结束下标'),
+                        onChanged: (text) => this._endIndex = int.parse(text),
+                      ),
+                    ),
+                    Expanded(
+                      child: RaisedButton(
+                          onPressed: () => this._delete(), child: Text("删除下标")),
+                    ),
+                    Expanded(
+                      child: RaisedButton(
+                          onPressed: () => this._clear(), child: Text("清空")),
+                    ),
+                  ],
+                ),
+                RaisedButton(onPressed: this._getValue, child: Text("获取值")),
+                Container(height: 10),
+                Text(_valueContent),
+              ],
+            ),
           ),
         ),
       ),
@@ -175,5 +159,10 @@ class AtTextSpan extends TextSpan {
     TextStyle style,
     GestureRecognizer recognizer,
     String semanticsLabel,
-  }) : super(text: text, children: children, style: style, recognizer: recognizer, semanticsLabel: semanticsLabel);
+  }) : super(
+            text: text,
+            children: children,
+            style: style,
+            recognizer: recognizer,
+            semanticsLabel: semanticsLabel);
 }

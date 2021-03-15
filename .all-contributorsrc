@@ -1,0 +1,33 @@
+{
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": false,
+  "contributors": [
+    {
+      "login": "wenboLee",
+      "name": "wenbo_lee",
+      "avatar_url": "https://avatars.githubusercontent.com/u/16222902?v=4",
+      "profile": "https://github.com/wenboLee",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "ConanXie",
+      "name": "xiejie",
+      "avatar_url": "https://avatars.githubusercontent.com/u/10040846?v=4",
+      "profile": "https://github.com/ConanXie",
+      "contributions": [
+        "code"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7,
+  "projectName": "FlutterTextSpanField",
+  "projectOwner": "JiangJuHong",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "skipCi": true
+}
