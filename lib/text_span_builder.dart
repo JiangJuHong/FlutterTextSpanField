@@ -144,7 +144,7 @@ class TextSpanBuilder {
               ? newSelection.baseOffset
               : newSelection.baseOffset + oldText.length - newText.length);
     }
-    XLog.log('range--$deleteRange');
+    Utils.log('range--$deleteRange');
 
     // 组件处理，如果组件在删除范围内，则把整块内容进行删除。如果组件不在删除范围内，但是在受影响范围内，则更新组件最新下标。
     List<int> removeIndex = [];
@@ -205,8 +205,8 @@ class TextSpanBuilder {
     // 获得最终的的文本和光标
     if (oldText.substring(deleteRange.start - 1, deleteRange.start) !=
         newText.substring(deleteRange.start - 1, deleteRange.start) || (oldText.length - newText.length > 1 && removeIndex.isEmpty) ) {
-      XLog.log('deleteStart--${deleteRange.start}');
-      XLog.log('extent--${deleteRange.end}');
+      Utils.log('deleteStart--${deleteRange.start}');
+      Utils.log('extent--${deleteRange.end}');
       finalText = newText;
       finalTextSelection = TextSelection(baseOffset: deleteRange.start, extentOffset: deleteRange.start);
     } else {
@@ -238,7 +238,7 @@ class TextSpanBuilder {
     if (this._customWidgets.length == 0) return;
 
     // 获得添加的内容长度
-    XLog.log('添加的内容长度: $oldText -- $newText');
+    Utils.log('添加的内容长度: $oldText -- $newText');
     int length = newText.length - oldText.length;
 
     // 获得添加的内容的范围
@@ -246,7 +246,7 @@ class TextSpanBuilder {
         start: newSelection.extentOffset - length,
         end: newSelection.extentOffset);
 
-    XLog.log('range: $appendRange');
+    Utils.log('range: $appendRange');
     // -1代表光标没在文本框，则默认为是在末尾追加 的内容，不进行处理
     if (appendRange.start == -1 && appendRange.end == -1) {
       return;

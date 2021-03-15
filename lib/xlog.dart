@@ -1,5 +1,5 @@
 /// 日志工具类
-class XLog {
+class Utils {
   /// 输出和log
   ///
   /// [showTime]  默认为true，会输出当前的时间
