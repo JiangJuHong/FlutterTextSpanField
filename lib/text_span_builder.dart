@@ -183,10 +183,12 @@ class TextSpanBuilder {
       }
 
       // 更新位置
+      // iOS英文->中文过程中先删除更新条件： 1. @前删除 2.在开始光标大于0的情况下，删除的前一个字符新旧文本不相等或者不在@输入范围内，但删除的数量大于1的情况
       if (deleteRange.end <= item.range.start + (deleteRange.end - deleteRange.start) &&
               (deleteRange.start > 0 && oldText.substring(deleteRange.start - 1, deleteRange.start) !=
                   newText.substring(deleteRange.start - 1, deleteRange.start)) ||
           (oldText.length - newText.length > 1 && !deleted)) {
+        // 此时删除的数量为新旧文本的差值
         item.range = _updateRange(item.range, -(oldText.length - newText.length));
       } else {
         item.range = _updateRange(item.range, -(deleteRange.end - deleteRange.start));
@@ -203,10 +205,10 @@ class TextSpanBuilder {
     String finalText;
     TextSelection finalTextSelection;
     // 获得最终的的文本和光标
+    // oldText和newText 删除的前一个字符如果一样则是正常删除， 如果不一样则是英文->拼音转换，需要分别处理
+    // 还有另一种情况是英文->英文字符也会变少，此时为后面的判断条件
     if (oldText.substring(deleteRange.start - 1, deleteRange.start) !=
         newText.substring(deleteRange.start - 1, deleteRange.start) || (oldText.length - newText.length > 1 && removeIndex.isEmpty) ) {
-      Utils.log('deleteStart--${deleteRange.start}');
-      Utils.log('extent--${deleteRange.end}');
       finalText = newText;
       finalTextSelection = TextSelection(baseOffset: deleteRange.start, extentOffset: deleteRange.start);
     } else {
