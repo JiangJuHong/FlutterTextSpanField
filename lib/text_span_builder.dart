@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:text_span_field/xlog.dart';
 
 import 'data/text_span_widget.dart';
 
@@ -37,6 +38,12 @@ class TextSpanBuilder {
     TextSelection selection = this._textEditingController.selection;
     TextSelection oldSelection = this._lastTextSelection;
 
+    XLog.log('控制器监听器 \t $oldText -- $text \n $oldSelection \n $selection');
+
+    // if ((oldSelection.start != selection.start || oldSelection.end != selection.end) && text == oldText) {
+    //   return;
+    // }
+
     // 文本变化
     if (text != oldText) {
       this._lastText = text;
@@ -57,7 +64,7 @@ class TextSpanBuilder {
   /// [newSelection] 新的文本光标
   _textChangeListener(String oldText, String newText, TextSelection oldSelection, TextSelection newSelection) {
     // 如果是替换
-    print(oldText + " -- " + newText);
+    XLog.log('change: \t $oldText --  $newText');
 
     // 如果是删除
     if (oldText.length > newText.length) {
@@ -92,8 +99,11 @@ class TextSpanBuilder {
     if (oldSelection.baseOffset != oldSelection.extentOffset) {
       deleteRange = TextRange(start: oldSelection.baseOffset, end: oldSelection.extentOffset);
     } else {
-      deleteRange = TextRange(start: newSelection.baseOffset, end: oldText.length == newSelection.baseOffset ? newSelection.baseOffset : newSelection.baseOffset + 1);
+      deleteRange = TextRange(
+          start: newSelection.baseOffset,
+          end: oldText.length == newSelection.baseOffset ? newSelection.baseOffset : newSelection.baseOffset + 1);
     }
+    XLog.log('range--$deleteRange');
 
     // 组件处理，如果组件在删除范围内，则把整块内容进行删除。如果组件不在删除范围内，但是在受影响范围内，则更新组件最新下标。
     List<int> removeIndex = [];
@@ -115,7 +125,10 @@ class TextSpanBuilder {
       // 更新删除范围
       if (deleted) {
         removeIndex.add(i);
-        deleteRange = TextRange(start: item.range.start < deleteRange.start ? item.range.start : deleteRange.start, end: item.range.end > deleteRange.end ? item.range.end : deleteRange.end);
+        deleteRange = TextRange(
+            start: item.range.start < deleteRange.start ? item.range.start : deleteRange.start,
+            end: item.range.end > deleteRange.end ? item.range.end : deleteRange.end);
+
         continue;
       }
 
@@ -126,7 +139,15 @@ class TextSpanBuilder {
       }
 
       // 更新位置
-      item.range = _updateRange(item.range, -(deleteRange.end - deleteRange.start));
+      if (deleteRange.end <= item.range.start + (deleteRange.end - deleteRange.start) &&
+              (deleteRange.start > 0 && oldText.substring(deleteRange.start - 1, deleteRange.start) !=
+                  newText.substring(deleteRange.start - 1, deleteRange.start)) ||
+          (oldText.length - newText.length > 1 && !deleted)) {
+        item.range = _updateRange(item.range, -(oldText.length - newText.length));
+      } else {
+        item.range = _updateRange(item.range, -(deleteRange.end - deleteRange.start));
+      }
+
       this._customWidgets[i] = item;
       changed = true;
     }
@@ -134,9 +155,19 @@ class TextSpanBuilder {
     // 删除下标内容
     removeIndex.forEach((index) => this._customWidgets.removeAt(index));
 
+    String finalText;
+    TextSelection finalTextSelection;
     // 获得最终的的文本和光标
-    String finalText = oldText.replaceRange(deleteRange.start, deleteRange.end, "");
-    TextSelection finalTextSelection = TextSelection(baseOffset: deleteRange.start, extentOffset: deleteRange.start);
+    if (oldText.substring(deleteRange.start - 1, deleteRange.start) !=
+        newText.substring(deleteRange.start - 1, deleteRange.start) || (oldText.length - newText.length > 1 && removeIndex.isEmpty) ) {
+      XLog.log('deleteStart--${deleteRange.start}');
+      XLog.log('extent--${deleteRange.end}');
+      finalText = newText;
+      finalTextSelection = TextSelection(baseOffset: deleteRange.start, extentOffset: deleteRange.start);
+    } else {
+      finalText = oldText.replaceRange(deleteRange.start, deleteRange.end, "");
+      finalTextSelection = TextSelection(baseOffset: deleteRange.start, extentOffset: deleteRange.start);
+    }
 
     // 内容相同则不进行更新
     if (!changed || finalText == newText) {
@@ -159,12 +190,14 @@ class TextSpanBuilder {
     if (this._customWidgets.length == 0) return;
 
     // 获得添加的内容长度
+    XLog.log('添加的内容长度: $oldText -- $newText');
     int length = newText.length - oldText.length;
 
     // 获得添加的内容的范围
     TextRange appendRange = TextRange(start: newSelection.extentOffset - length, end: newSelection.extentOffset);
 
-    // -1代表光标没在文本框，则默认为是在末尾追加的内容，不进行处理
+    XLog.log('range: $appendRange');
+    // -1代表光标没在文本框，则默认为是在末尾追加 的内容，不进行处理
     if (appendRange.start == -1 && appendRange.end == -1) {
       return;
     }
@@ -187,6 +220,7 @@ class TextSpanBuilder {
   /// [oldSelection] 旧的文本光标
   /// [newSelection] 新的文本光标
   void _cursorPositionLimit(String oldText, String newText, TextSelection oldSelection, TextSelection newSelection) {
+    // XLog.log('更新光标 $oldText -> $newText \n $oldSelection \n $newSelection');
     for (var item in this._customWidgets) {
       // 非块组件不进行限制
       if (item.block == null || !item.block) {
@@ -205,6 +239,7 @@ class TextSpanBuilder {
       // 如果位置发生改变，则进行应用
       if (start != newSelection.baseOffset || end != newSelection.extentOffset) {
         this._textEditingController.selection = TextSelection(baseOffset: start, extentOffset: end);
+        // this._deleteLimit(oldText, newText, oldSelection, newSelection);
         break;
       }
     }
@@ -214,7 +249,8 @@ class TextSpanBuilder {
   /// [text] 文本内容
   List<TextSpanWidget> _buildTextSpanWidget(String text) {
     // 没有节点就创建普通文本节点
-    if (this._customWidgets.length == 0) return [TextSpanWidget(range: TextRange(start: 0, end: text.length), span: TextSpan(text: text))];
+    if (this._customWidgets.length == 0)
+      return [TextSpanWidget(range: TextRange(start: 0, end: text.length), span: TextSpan(text: text))];
 
     // 初始化节点
     List<TextSpanWidget> source = this._customWidgets;
@@ -241,7 +277,7 @@ class TextSpanBuilder {
     }
 
     // 如果最后一个节点和末尾有间隙，则进行增加
-    if (prevItemRange.end != text.length) {
+    if (prevItemRange.end < text.length) {
       TextRange targetRange = TextRange(start: prevItemRange.end, end: text.length);
       result.add(TextSpanWidget(range: targetRange, span: TextSpan(text: targetRange.textInside(text))));
     }
@@ -317,7 +353,9 @@ class TextSpanBuilder {
     this.appendText(text, index);
 
     // 添加组件
-    this._customWidgets.add(TextSpanWidget(range: TextRange(start: index, end: index + text.length), block: true, span: span));
+    this
+        ._customWidgets
+        .add(TextSpanWidget(range: TextRange(start: index, end: index + text.length), block: true, span: span));
   }
 
   /// 追加普通文本

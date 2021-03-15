@@ -2,6 +2,8 @@ name: text_span_field_example
 description: Demonstrates how to use the text_span_field plugin.
 publish_to: 'none'
 
+version: 1.0.0+1
+
 environment:
   sdk: ">=2.1.0 <3.0.0"
 
