@@ -191,7 +191,6 @@ class TextSpanBuilder {
         // 此时删除的数量为新旧文本的差值
         item.range = _updateRange(item.range, -(oldText.length - newText.length));
       } else {
-        Utils.log('deleteRange--$deleteRange');
         item.range = _updateRange(item.range, -(deleteRange.end - deleteRange.start));
       }
 
