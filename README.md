@@ -146,11 +146,11 @@ Thanks goes to these wonderful people
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
 <!-- prettier-ignore-start -->
 <!-- markdownlint-disable -->
-
 <table>
   <tr>
     <td align="center"><a href="https://github.com/wenboLee"><img src="https://avatars.githubusercontent.com/u/16222902?v=4?s=100" width="100px;" alt=""/><br /><sub><b>wenbo_lee</b></sub></a><br /><a href="https://github.com/JiangJuHong/FlutterTextSpanField/commits?author=wenboLee" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/ConanXie"><img src="https://avatars.githubusercontent.com/u/10040846?v=4?s=100" width="100px;" alt=""/><br /><sub><b>xiejie</b></sub></a><br /><a href="https://github.com/JiangJuHong/FlutterTextSpanField/commits?author=ConanXie" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/cherrybiu"><img src="https://avatars.githubusercontent.com/u/26567876?v=4?s=100" width="100px;" alt=""/><br /><sub><b>淡航</b></sub></a><br /><a href="https://github.com/JiangJuHong/FlutterTextSpanField/commits?author=cherrybiu" title="Code">💻</a></td>
   </tr>
 </table>
 
