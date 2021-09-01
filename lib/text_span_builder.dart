@@ -224,10 +224,12 @@ class TextSpanBuilder {
     }
 
     // 更新文本和光标
-    this._textEditingController.value = TextEditingValue(
-      text: finalText,
-      selection: finalTextSelection,
-    );
+    this._textEditingController.text = finalText;
+
+    //修复删除自定义组件时的光标偏移问题
+    Future.delayed(Duration(milliseconds: 10), () {
+      this._textEditingController.selection = finalTextSelection;
+    });
   }
 
   /// 添加限制，添加内容时，应该同步更新组件的范围
