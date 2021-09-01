@@ -151,6 +151,7 @@ Thanks goes to these wonderful people
     <td align="center"><a href="https://github.com/wenboLee"><img src="https://avatars.githubusercontent.com/u/16222902?v=4?s=100" width="100px;" alt=""/><br /><sub><b>wenbo_lee</b></sub></a><br /><a href="https://github.com/JiangJuHong/FlutterTextSpanField/commits?author=wenboLee" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/ConanXie"><img src="https://avatars.githubusercontent.com/u/10040846?v=4?s=100" width="100px;" alt=""/><br /><sub><b>xiejie</b></sub></a><br /><a href="https://github.com/JiangJuHong/FlutterTextSpanField/commits?author=ConanXie" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/cherrybiu"><img src="https://avatars.githubusercontent.com/u/26567876?v=4?s=100" width="100px;" alt=""/><br /><sub><b>淡航</b></sub></a><br /><a href="https://github.com/JiangJuHong/FlutterTextSpanField/commits?author=cherrybiu" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/tracyis"><img src="https://avatars.githubusercontent.com/u/20700876?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Tracyis</b></sub></a><br /><a href="https://github.com/JiangJuHong/FlutterTextSpanField/commits?author=tracyis" title="Code">💻</a></td>
   </tr>
 </table>
 
