@@ -2,7 +2,7 @@
 
 <div align="center">
 
-[![All Contributors](https://img.shields.io/badge/all_contributors-3-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-4-orange.svg?style=flat-square)](#contributors-)
 [![](https://img.shields.io/pub/v/text_span_field.svg)](https://pub.dartlang.org/packages/text_span_field)
 [![](https://img.shields.io/github/license/JiangJuHong/FlutterTencentImPlugin)](https://www.apache.org/licenses/LICENSE-2.0)
 [![](https://img.shields.io/badge/qq群-850923396-1)](https://jq.qq.com/?_wv=1027&k=QxCWMlUf)
