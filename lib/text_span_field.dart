@@ -322,6 +322,7 @@ class TextSpanField extends StatefulWidget {
     this.buildCounter,
     this.scrollController,
     this.scrollPhysics,
+    // TODO 自定义构建
     this.textSpanBuilder,
   })  : assert(textAlign != null),
         assert(readOnly != null),
@@ -365,7 +366,7 @@ class TextSpanField extends StatefulWidget {
                   )),
         super(key: key);
 
-  /// Custom Builder
+  /// TODO Custom Builder
   final TextSpanBuilder textSpanBuilder;
 
   /// Controls the text being edited.
@@ -869,6 +870,7 @@ class _TextSpanFieldState extends State<TextSpanField>
     if (widget.controller == null) {
       _controller = TextEditingController();
     }
+    // TODO 自定义构建
     _textSpanBuilder = widget.textSpanBuilder ?? TextSpanBuilder();
     _effectiveFocusNode.canRequestFocus = _isEnabled;
   }
@@ -968,7 +970,7 @@ class _TextSpanFieldState extends State<TextSpanField>
     );
 
     final ThemeData themeData = Theme.of(context);
-    final TextStyle style = themeData.textTheme.subhead.merge(widget.style);
+    final TextStyle style = themeData.textTheme.subtitle1.merge(widget.style);
     final Brightness keyboardAppearance =
         widget.keyboardAppearance ?? themeData.primaryColorBrightness;
     final TextEditingController controller = _effectiveController;
